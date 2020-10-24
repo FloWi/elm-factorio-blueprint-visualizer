@@ -1,0 +1,26 @@
+{
+    "name": "elm-factorio-blueprint-visualizer",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "elm-app build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/FloWi/elm-factorio-blueprint-visualizer.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/FloWi/elm-factorio-blueprint-visualizer/issues"
+    },
+    "homepage": "https://github.com/FloWi/elm-factorio-blueprint-visualizer#readme",
+    "dependencies": {
+        "create-elm-app": "^5.9.0"
+    }
+}
