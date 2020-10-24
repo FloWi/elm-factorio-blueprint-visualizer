@@ -1,0 +1,91 @@
+/*
+  elm-hot creates an additional div wrapper around the app to make HMR possible.
+  This could break styling in development mode if you are using Elm UI.
+
+  More context in the issue:
+    https://github.com/halfzebra/create-elm-app/issues/320
+*/
+[data-elm-hot="true"] {
+  height: inherit;
+}
+
+body {
+  font-family: "Source Sans Pro", "Trebuchet MS", "Lucida Grande",
+    "Bitstream Vera Sans", "Helvetica Neue", sans-serif;
+  margin: 0;
+  text-align: center;
+  color: #293c4b;
+  background-color: lightslategray;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+.main {
+  margin-left: 20px;
+}
+
+/* img {
+  margin: 20px 0;
+  max-width: 200px;
+} */
+
+.row {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.my-transport-belt {
+  background-image: url("/hr-transport-belt.png");
+  display: inline-block;
+  flex-shrink: 0;
+  flex-grow: 0;
+  padding: 0;
+  margin: 0;
+  background-color: lightblue;
+}
+
+sprite,
+.entity,
+.transport-belt {
+  display: inline-block;
+  flex-shrink: 0;
+  flex-grow: 0;
+  padding: 0;
+  margin: 0;
+  width: 64px;
+  height: 64px;
+}
+
+.transport-belt {
+  background-image: url("/hr-transport-belt.png");
+}
+
+.entity--transport-belt--e,
+.transport-belt[direction="e"] {
+  animation: animation--transport-belt--east 266.6666666667ms steps(16) infinite;
+}
+
+.entity--transport-belt--w,
+.transport-belt[direction="w"] {
+  animation: animation--transport-belt--west 266.6666666667ms steps(16) infinite;
+}
+
+@keyframes animation--transport-belt--east {
+  from {
+    background-position: -32px -38px;
+  }
+  to {
+    background-position: -2080px -38px;
+  }
+}
+
+@keyframes animation--transport-belt--west {
+  from {
+    background-position: -32px -166px;
+  }
+  to {
+    background-position: -2080px -166px;
+  }
+}
