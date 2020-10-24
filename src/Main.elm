@@ -49,6 +49,7 @@ type alias Model =
     , width : Float
     , height : Float
     , drawHeight : Float
+    , debug : Bool
     }
 
 
@@ -60,7 +61,8 @@ type alias Pos =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { initialOffset =
+    ( { debug = False
+      , initialOffset =
             { x = 32
             , y = 32
             }
@@ -89,6 +91,7 @@ type Msg
     | UpdateWidth String
     | UpdateHeight String
     | UpdateDrawHeight String
+    | ToggleDebug
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -145,6 +148,9 @@ update msg model =
 
         NoOp ->
             ( model, Cmd.none )
+
+        ToggleDebug ->
+            ( { model | debug = not model.debug }, Cmd.none )
 
 
 
@@ -274,6 +280,14 @@ type Direction
     | East
     | North
     | South
+    | SouthEast
+    | WestSouth
+    | EastNorth
+    | NorthWest
+    | EastSouth
+    | SouthWest
+    | NorthEast
+    | WestNorth
 
 
 rowIndex dir =
@@ -289,6 +303,30 @@ rowIndex dir =
 
         South ->
             3
+
+        SouthEast ->
+            8
+
+        WestSouth ->
+            11
+
+        EastNorth ->
+            4
+
+        NorthWest ->
+            7
+
+        EastSouth ->
+            9
+
+        SouthWest ->
+            10
+
+        NorthEast ->
+            5
+
+        WestNorth ->
+            6
 
 
 cssAnimatedBeltNode : Direction -> Model -> Html msg
@@ -328,33 +366,83 @@ renderLocationTable model =
         )
 
 
+circleClockwise : Model -> List (Html msg)
+circleClockwise model =
+    [ div [ class "row" ]
+        [ cssAnimatedBeltNode SouthEast model
+        , cssAnimatedBeltNode WestSouth model
+        ]
+    , div [ class "row" ]
+        [ cssAnimatedBeltNode EastNorth model
+        , cssAnimatedBeltNode NorthWest model
+        ]
+    ]
+
+
+circleCounterClockwise : Model -> List (Html msg)
+circleCounterClockwise model =
+    [ div [ class "row" ]
+        [ cssAnimatedBeltNode EastSouth model
+        , cssAnimatedBeltNode SouthWest model
+        ]
+    , div [ class "row" ]
+        [ cssAnimatedBeltNode NorthEast model
+        , cssAnimatedBeltNode WestNorth model
+        ]
+    ]
+
+
+checkbox : msg -> String -> Bool -> Html msg
+checkbox msg name isChecked =
+    label
+        [ style "padding" "20px" ]
+        [ input [ type_ "checkbox", onClick msg, H.checked isChecked ] []
+        , text name
+        ]
+
+
+debugShow : Bool -> List a -> List a
+debugShow isDebug x =
+    if isDebug then
+        x
+
+    else
+        []
+
+
 view : Model -> Html Msg
 view model =
     div [ class "main" ]
         ([ h1 [] [ text "Factorio belts" ]
-         , formSlider model "initial-offset x" -64 64 (\m -> m.initialOffset.x) UpdateInitialOffsetX
-         , formSlider model "initial-offset y" -64 64 (\m -> m.initialOffset.y) UpdateInitialOffsetY
-         , formSlider model "offset x" -80 80 (\m -> m.offset.x) UpdateOffsetX
-         , formSlider model "offset y" -80 80 (\m -> m.offset.y) UpdateOffsetY
-         , formSlider model "width" -80 80 (\m -> m.width) UpdateWidth
-         , formSlider model "height" -80 80 (\m -> m.height) UpdateHeight
-         , formSlider model "draw-height" -80 80 (\m -> m.drawHeight) UpdateDrawHeight
-
-         --  , div [ class "row" ]
-         --     (List.repeat 3 (cssBeltNode model 0 0))
-         , div [ class "row" ]
-            (List.repeat 3 (cssAnimatedBeltNode West model) ++ List.repeat 3 (cssAnimatedBeltNode East model))
-         , div []
-            [ renderLocationTable model
-            ]
-
-         --  , div [ class "row" ]
-         --     (List.repeat 3 (cssBeltNode model 1 0))
-         , div [ class "row" ]
-            (List.repeat 3 (cssAnimatedBeltNode East model) ++ List.repeat 3 (cssAnimatedBeltNode West model))
+         , checkbox ToggleDebug "Debug" model.debug
          ]
+            ++ debugShow model.debug
+                [ formSlider model "initial-offset x" -64 64 (\m -> m.initialOffset.x) UpdateInitialOffsetX
+                , formSlider model "initial-offset y" -64 64 (\m -> m.initialOffset.y) UpdateInitialOffsetY
+                , formSlider model "offset x" -80 80 (\m -> m.offset.x) UpdateOffsetX
+                , formSlider model "offset y" -80 80 (\m -> m.offset.y) UpdateOffsetY
+                , formSlider model "width" -80 80 (\m -> m.width) UpdateWidth
+                , formSlider model "height" -80 80 (\m -> m.height) UpdateHeight
+                , formSlider model "draw-height" -80 80 (\m -> m.drawHeight) UpdateDrawHeight
+                ]
+            ++ [ div [ class "row" ]
+                    (List.repeat 3 (cssBeltNode model 0 0))
+               , div [ class "row" ]
+                    (List.repeat 3 (cssAnimatedBeltNode West model) ++ List.repeat 3 (cssAnimatedBeltNode East model))
+               , div [ class "row" ]
+                    (List.repeat 3 (cssBeltNode model 1 0))
+               , div [ class "row" ]
+                    (List.repeat 3 (cssAnimatedBeltNode East model) ++ List.repeat 3 (cssAnimatedBeltNode West model))
+               ]
+            ++ circleClockwise model
+            ++ circleCounterClockwise model
             ++ List.repeat 3 (div [ class "row" ] [ cssAnimatedBeltNode North model, cssAnimatedBeltNode East model, cssAnimatedBeltNode South model, cssAnimatedBeltNode West model ])
             ++ List.repeat 3 (div [ class "row" ] [ cssAnimatedBeltNode South model ])
+            ++ debugShow model.debug
+                [ div []
+                    [ renderLocationTable model
+                    ]
+                ]
             ++ [ img [ src "/hr-transport-belt.png" ] []
                ]
         )
