@@ -1,5 +1,6 @@
 import './main.css';
 import { Elm } from './Main.elm';
+import 'elm-canvas'
 import * as serviceWorker from './serviceWorker';
 
 Elm.Main.init({
