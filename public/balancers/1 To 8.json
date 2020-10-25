@@ -1,0 +1,164 @@
+{
+  "blueprint_book": {
+    "blueprints": [
+      {
+        "blueprint": {
+          "icons": [
+            {
+              "signal": {
+                "type": "item",
+                "name": "transport-belt"
+              },
+              "index": 1
+            },
+            {
+              "signal": {
+                "type": "virtual",
+                "name": "signal-1"
+              },
+              "index": 2
+            },
+            {
+              "signal": {
+                "type": "virtual",
+                "name": "signal-T"
+              },
+              "index": 3
+            },
+            {
+              "signal": {
+                "type": "virtual",
+                "name": "signal-8"
+              },
+              "index": 4
+            }
+          ],
+          "entities": [
+            {
+              "entity_number": 1,
+              "name": "splitter",
+              "position": {
+                "x": -3.5,
+                "y": -2
+              }
+            },
+            {
+              "entity_number": 2,
+              "name": "splitter",
+              "position": {
+                "x": -1.5,
+                "y": -2
+              }
+            },
+            {
+              "entity_number": 3,
+              "name": "splitter",
+              "position": {
+                "x": 0.5,
+                "y": -2
+              }
+            },
+            {
+              "entity_number": 4,
+              "name": "splitter",
+              "position": {
+                "x": 2.5,
+                "y": -2
+              }
+            },
+            {
+              "entity_number": 5,
+              "name": "transport-belt",
+              "position": {
+                "x": -3,
+                "y": -1
+              }
+            },
+            {
+              "entity_number": 6,
+              "name": "transport-belt",
+              "position": {
+                "x": -1,
+                "y": -1
+              }
+            },
+            {
+              "entity_number": 7,
+              "name": "transport-belt",
+              "position": {
+                "x": -2,
+                "y": -1
+              },
+              "direction": 6
+            },
+            {
+              "entity_number": 8,
+              "name": "splitter",
+              "position": {
+                "x": -1.5,
+                "y": 0
+              }
+            },
+            {
+              "entity_number": 9,
+              "name": "transport-belt",
+              "position": {
+                "x": 1,
+                "y": -1
+              },
+              "direction": 2
+            },
+            {
+              "entity_number": 10,
+              "name": "splitter",
+              "position": {
+                "x": 0.5,
+                "y": 0
+              }
+            },
+            {
+              "entity_number": 11,
+              "name": "transport-belt",
+              "position": {
+                "x": 0,
+                "y": -1
+              }
+            },
+            {
+              "entity_number": 12,
+              "name": "transport-belt",
+              "position": {
+                "x": 2,
+                "y": -1
+              }
+            },
+            {
+              "entity_number": 13,
+              "name": "transport-belt",
+              "position": {
+                "x": -1,
+                "y": 2
+              }
+            },
+            {
+              "entity_number": 14,
+              "name": "splitter",
+              "position": {
+                "x": -0.5,
+                "y": 1
+              }
+            }
+          ],
+          "item": "blueprint",
+          "label": "1 To 8",
+          "version": 73019621376
+        },
+        "index": 0
+      }
+    ],
+    "item": "blueprint-book",
+    "label": "Transport Belt Balancers Blueprint Book",
+    "active_index": 0,
+    "version": 73019621376
+  }
+}

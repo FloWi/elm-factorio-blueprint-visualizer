@@ -1,0 +1,90 @@
+{
+  "blueprint_book": {
+    "blueprints": [
+      {
+        "blueprint": {
+          "icons": [
+            {
+              "signal": {
+                "type": "item",
+                "name": "transport-belt"
+              },
+              "index": 1
+            },
+            {
+              "signal": {
+                "type": "virtual",
+                "name": "signal-2"
+              },
+              "index": 2
+            },
+            {
+              "signal": {
+                "type": "virtual",
+                "name": "signal-T"
+              },
+              "index": 3
+            },
+            {
+              "signal": {
+                "type": "virtual",
+                "name": "signal-2"
+              },
+              "index": 4
+            }
+          ],
+          "entities": [
+            {
+              "entity_number": 1,
+              "name": "transport-belt",
+              "position": {
+                "x": -1,
+                "y": -1
+              }
+            },
+            {
+              "entity_number": 2,
+              "name": "splitter",
+              "position": {
+                "x": -0.5,
+                "y": 0
+              }
+            },
+            {
+              "entity_number": 3,
+              "name": "transport-belt",
+              "position": {
+                "x": 0,
+                "y": -1
+              }
+            },
+            {
+              "entity_number": 4,
+              "name": "transport-belt",
+              "position": {
+                "x": -1,
+                "y": 1
+              }
+            },
+            {
+              "entity_number": 5,
+              "name": "transport-belt",
+              "position": {
+                "x": 0,
+                "y": 1
+              }
+            }
+          ],
+          "item": "blueprint",
+          "label": "2 To 2",
+          "version": 73019621376
+        },
+        "index": 0
+      }
+    ],
+    "item": "blueprint-book",
+    "label": "Transport Belt Balancers Blueprint Book",
+    "active_index": 0,
+    "version": 73019621376
+  }
+}
