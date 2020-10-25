@@ -8,8 +8,11 @@ import Canvas exposing (..)
 import Canvas.Settings exposing (..)
 import Canvas.Texture exposing (..)
 import Color
+import Css exposing (local)
+import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes exposing (style)
+import List.Extra
 
 
 type alias Model =
@@ -25,7 +28,7 @@ type Load a
 
 
 type alias Sprites =
-    { t : Texture
+    { animationFrames : List Texture
     }
 
 
@@ -41,6 +44,35 @@ init =
     )
 
 
+w =
+    64
+
+
+h =
+    70
+
+
+offset =
+    64
+
+
+createTextureList : Texture -> List Texture
+createTextureList texture =
+    let
+        x =
+            32
+
+        y =
+            38
+    in
+    List.range 0 (numAnimationFrames - 1)
+        |> List.map (\i -> sprite { x = x + (offset + w) * toFloat i, y = y, width = w, height = h } texture)
+
+
+numAnimationFrames =
+    16
+
+
 view : Model -> Html Msg
 view model =
     let
@@ -50,10 +82,21 @@ view model =
         height =
             768
 
+        animationIndex =
+            if model.frame > 0 then
+                --0
+                modBy numAnimationFrames model.frame
+
+            else
+                0
+
         firstBelt =
             case model.sprites of
                 Success sprites ->
-                    renderBelt sprites.t
+                    sprites.animationFrames
+                        |> List.Extra.getAt animationIndex
+                        |> Maybe.map (renderBelt { x = toFloat 0, y = toFloat 0 })
+                        |> Maybe.withDefault []
 
                 _ ->
                     []
@@ -76,28 +119,16 @@ renderSquare =
         [ rect ( 0, 0 ) 1024 768 ]
 
 
-renderBelt foo =
-    let
-        x =
-            32
+type alias Pos =
+    { x : Float
+    , y : Float
+    }
 
-        y =
-            38
 
-        w =
-            64
-
-        h =
-            70
-
-        spriteLocation =
-            { x = x, y = y, width = w, height = h }
-
-        westToEastBelt =
-            sprite spriteLocation foo
-    in
-    [ shapes [ fill Color.lightGreen ] [ rect ( 0, 0 ) w h ]
-    , texture [] ( 0, 0 ) westToEastBelt
+renderBelt : Pos -> Texture -> List Renderable
+renderBelt location tex =
+    [ shapes [ fill Color.lightGreen ] [ rect ( location.x, location.y ) w h ]
+    , texture [] ( location.x, location.y ) tex
     ]
 
 
@@ -114,7 +145,7 @@ update msg model =
                 t =
                     Debug.log "texture" texture
             in
-            ( { model | sprites = Success { t = texture } }, Cmd.none )
+            ( { model | sprites = Success { animationFrames = createTextureList texture } }, Cmd.none )
 
         TextureLoaded Nothing ->
             let
