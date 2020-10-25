@@ -44,33 +44,67 @@ init =
     )
 
 
-w =
-    64
-
-
-h =
-    70
-
-
-offset =
-    64
+offsets =
+    { initialOffset =
+        { x = 32
+        , y = 38
+        }
+    , offset =
+        { x = 64
+        , y = 64
+        }
+    , width = 64
+    , height = 64
+    }
 
 
 createTextureList : Texture -> List Texture
 createTextureList texture =
     let
+        o =
+            offsets
+
         x =
-            32
+            o.initialOffset.x
 
         y =
-            38
+            o.initialOffset.y
     in
     List.range 0 (numAnimationFrames - 1)
-        |> List.map (\i -> sprite { x = x + (offset + w) * toFloat i, y = y, width = w, height = h } texture)
+        |> List.map (\i -> sprite { x = x + (o.offset.x + o.width) * toFloat i - 1, y = o.initialOffset.y, width = o.width + 1, height = o.height } texture)
 
 
 numAnimationFrames =
     16
+
+
+framerate =
+    60 / 30
+
+
+renderBeltAnimation : Model -> Pos -> List Renderable
+renderBeltAnimation model pos =
+    let
+        renderFrame =
+            round (toFloat model.frame / framerate)
+
+        animationIndex =
+            if renderFrame > 0 then
+                --0
+                modBy numAnimationFrames renderFrame
+
+            else
+                0
+    in
+    case model.sprites of
+        Success sprites ->
+            sprites.animationFrames
+                |> List.Extra.getAt animationIndex
+                |> Maybe.map (renderBelt pos)
+                |> Maybe.withDefault []
+
+        _ ->
+            []
 
 
 view : Model -> Html Msg
@@ -81,25 +115,6 @@ view model =
 
         height =
             768
-
-        animationIndex =
-            if model.frame > 0 then
-                --0
-                modBy numAnimationFrames model.frame
-
-            else
-                0
-
-        firstBelt =
-            case model.sprites of
-                Success sprites ->
-                    sprites.animationFrames
-                        |> List.Extra.getAt animationIndex
-                        |> Maybe.map (renderBelt { x = toFloat 0, y = toFloat 0 })
-                        |> Maybe.withDefault []
-
-                _ ->
-                    []
     in
     Canvas.toHtmlWith
         { width = width
@@ -110,7 +125,9 @@ view model =
         ([ shapes [ fill Color.white ] [ rect ( 0, 0 ) width height ]
          , renderSquare
          ]
-            ++ firstBelt
+            ++ renderBeltAnimation model { x = 0, y = toFloat 0 }
+            ++ renderBeltAnimation model { x = offsets.width, y = toFloat 0 }
+            ++ renderBeltAnimation model { x = toFloat 2 * offsets.width, y = toFloat 0 }
         )
 
 
@@ -127,8 +144,8 @@ type alias Pos =
 
 renderBelt : Pos -> Texture -> List Renderable
 renderBelt location tex =
-    [ shapes [ fill Color.lightGreen ] [ rect ( location.x, location.y ) w h ]
-    , texture [] ( location.x, location.y ) tex
+    [ --shapes [ fill Color.lightGreen ] [ rect ( location.x, location.y ) w h ]
+      texture [] ( location.x, location.y ) tex
     ]
 
 
