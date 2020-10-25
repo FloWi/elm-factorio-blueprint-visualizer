@@ -20,7 +20,7 @@
         "url": "https://github.com/FloWi/elm-factorio-blueprint-visualizer/issues"
     },
     "homepage": "https://github.com/FloWi/elm-factorio-blueprint-visualizer#readme",
-    "dependencies": {
+    "devDependencies": {
         "create-elm-app": "^5.9.0"
     }
 }
