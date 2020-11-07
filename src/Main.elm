@@ -82,6 +82,28 @@ framerate =
     60 / 30
 
 
+type Direction
+    = West
+    | East
+    | North
+    | South
+
+
+rowIndexByDirection dir =
+    case dir of
+        West ->
+            1
+
+        East ->
+            0
+
+        North ->
+            2
+
+        South ->
+            3
+
+
 renderBeltAnimation : Model -> Pos -> List Renderable
 renderBeltAnimation model pos =
     let
@@ -158,17 +180,9 @@ update msg model =
             )
 
         TextureLoaded (Just texture) ->
-            let
-                t =
-                    Debug.log "texture" texture
-            in
             ( { model | sprites = Success { animationFrames = createTextureList texture } }, Cmd.none )
 
         TextureLoaded Nothing ->
-            let
-                foo =
-                    Debug.log "loading failed" 0
-            in
             ( model, Cmd.none )
 
 
