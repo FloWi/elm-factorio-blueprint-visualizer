@@ -46,7 +46,16 @@ init =
     )
 
 
-offsets : { initialOffset : { x : Float, y : Float }, offset : { x : Float, y : Float }, width : Float, height : Float }
+
+{-
+
+   - it seems that the graphics have a 2px overlap (on each side?)
+   - so, the grid is still 64x64px, but I load (-2,-2) to (66,66)
+
+-}
+
+
+offsets : { initialOffset : { x : Float, y : Float }, offset : { x : Float, y : Float }, width : Float, height : Float, overlap : Float }
 offsets =
     { initialOffset =
         { x = 32
@@ -58,6 +67,7 @@ offsets =
         }
     , width = 64
     , height = 64
+    , overlap = 2
     }
 
 
@@ -83,10 +93,10 @@ createTextureDict texture =
                 |> List.map
                     (\i ->
                         sprite
-                            { x = x + (o.offset.x + o.width) * toFloat i - 1
-                            , y = o.initialOffset.y + toFloat directionIndex * (o.height + o.offset.y)
-                            , width = o.width + 1
-                            , height = o.height
+                            { x = -o.overlap + x + (o.offset.x + o.width) * toFloat i
+                            , y = -o.overlap + o.initialOffset.y + toFloat directionIndex * (o.height + o.offset.y)
+                            , width = o.width + 2 * o.overlap
+                            , height = o.height + 2 * o.overlap
                             }
                             texture
                     )
@@ -172,7 +182,7 @@ renderBeltAnimation : Model -> GameEntity -> List Renderable
 renderBeltAnimation model { x, y, direction } =
     let
         pos =
-            { x = x * offsets.width, y = y * offsets.height }
+            { x = -offsets.overlap + x * offsets.width, y = -offsets.overlap + y * offsets.height }
 
         renderFrame =
             round (toFloat model.frame / framerate)
@@ -298,7 +308,12 @@ view model =
             ++ (straight EastWest 4 |> List.concatMap (renderBeltAnimation model))
             ++ (straightVertical NorthSouth 4 |> List.concatMap (renderBeltAnimation model))
             ++ (straightVertical SouthNorth 5 |> List.concatMap (renderBeltAnimation model))
+         -- ++ [ grid ]
         )
+
+
+grid =
+    shapes [] [ rect ( offsets.width - 0.5, -0.5 ) 1 (offsets.height * 20 + 0.5) ]
 
 
 renderSquare =
