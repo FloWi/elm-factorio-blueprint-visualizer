@@ -12,7 +12,7 @@ import Color
 import Css exposing (local)
 import Dict exposing (Dict)
 import Dict.Extra
-import Html exposing (Html, a)
+import Html exposing (Html, a, div)
 import Html.Attributes exposing (style)
 import List.Extra
 import Svg.Styled.Attributes exposing (direction)
@@ -292,34 +292,6 @@ straightVertical dir x =
     ]
 
 
-
--- view : Model -> Html Msg
--- view model =
---     let
---         width =
---             1024
---         height =
---             768
---     in
---     Canvas.toHtmlWith
---         { width = width
---         , height = height
---         , textures = [ loadFromImageUrl "/hr-transport-belt.png" TextureLoaded ]
---         }
---         [ style "border" "1px solid black" ]
---         ([ shapes [ fill Color.white ] [ rect ( 0, 0 ) width height ]
---          , renderSquare
---          ]
---             ++ (circle { x = 0, y = 0 } Clockwise |> List.concatMap (renderBeltAnimation model))
---             ++ (circle { x = 2, y = 0 } CounterClockwise |> List.concatMap (renderBeltAnimation model))
---             ++ (straight WestEast 3 |> List.concatMap (renderBeltAnimation model))
---             ++ (straight EastWest 4 |> List.concatMap (renderBeltAnimation model))
---             ++ (straightVertical NorthSouth 4 |> List.concatMap (renderBeltAnimation model))
---             ++ (straightVertical SouthNorth 5 |> List.concatMap (renderBeltAnimation model))
---          -- ++ [ grid ]
---         )
-
-
 renderSpriteGraphicWithGrid : Model -> List Renderable
 renderSpriteGraphicWithGrid model =
     case model.sprites of
@@ -332,6 +304,41 @@ renderSpriteGraphicWithGrid model =
 
 view : Model -> Html Msg
 view model =
+    div []
+        [ viewAnimatedBelts model
+        , viewSpritesheetWithGrid model
+        ]
+
+
+viewAnimatedBelts : Model -> Html Msg
+viewAnimatedBelts model =
+    let
+        width =
+            640
+
+        height =
+            480
+    in
+    Canvas.toHtmlWith
+        { width = width
+        , height = height
+        , textures = [ loadFromImageUrl "/hr-transport-belt.png" TextureLoaded ]
+        }
+        [ style "border" "1px solid black" ]
+        ([ shapes [ fill Color.white ] [ rect ( 0, 0 ) width height ]
+         , renderSquare
+         ]
+            ++ (circle { x = 0, y = 0 } Clockwise |> List.concatMap (renderBeltAnimation model))
+            ++ (circle { x = 2, y = 0 } CounterClockwise |> List.concatMap (renderBeltAnimation model))
+            ++ (straight WestEast 3 |> List.concatMap (renderBeltAnimation model))
+            ++ (straight EastWest 4 |> List.concatMap (renderBeltAnimation model))
+            ++ (straightVertical NorthSouth 4 |> List.concatMap (renderBeltAnimation model))
+            ++ (straightVertical SouthNorth 5 |> List.concatMap (renderBeltAnimation model))
+        )
+
+
+viewSpritesheetWithGrid : Model -> Html Msg
+viewSpritesheetWithGrid model =
     Canvas.toHtmlWith
         { width = model.canvasWidth
         , height = model.canvasHeight
@@ -341,7 +348,6 @@ view model =
         ([ shapes [ fill Color.gray ] [ rect ( 0, 0 ) (toFloat model.canvasWidth) (toFloat model.canvasHeight) ]
          ]
             ++ renderSpriteGraphicWithGrid model
-         -- ++ [ grid ]
         )
 
 
