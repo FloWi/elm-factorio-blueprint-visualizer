@@ -55,7 +55,7 @@ init =
 -}
 
 
-offsets : { initialOffset : { x : Float, y : Float }, offset : { x : Float, y : Float }, width : Float, height : Float, overlap : Float }
+offsets : { initialOffset : { x : Int, y : Int }, offset : { x : Int, y : Int }, width : Int, height : Int, overlap : Int }
 offsets =
     { initialOffset =
         { x = 32
@@ -93,10 +93,10 @@ createTextureDict texture =
                 |> List.map
                     (\i ->
                         sprite
-                            { x = -o.overlap + x + (o.offset.x + o.width) * toFloat i
-                            , y = -o.overlap + o.initialOffset.y + toFloat directionIndex * (o.height + o.offset.y)
-                            , width = o.width + 2 * o.overlap
-                            , height = o.height + 2 * o.overlap
+                            { x = toFloat (-o.overlap + x + (o.offset.x + o.width) * i)
+                            , y = toFloat (-o.overlap + o.initialOffset.y + directionIndex * (o.height + o.offset.y))
+                            , width = toFloat (o.width + 2 * o.overlap)
+                            , height = toFloat (o.height + 2 * o.overlap)
                             }
                             texture
                     )
@@ -216,7 +216,7 @@ renderBeltAnimation model { x, y, direction } =
 
 
 type alias GameEntity =
-    { x : Float, y : Float, direction : BeltRenderDirection }
+    { x : Int, y : Int, direction : BeltRenderDirection }
 
 
 type RotationDirection
@@ -265,7 +265,7 @@ circle offset rot =
     ]
 
 
-straight : BeltRenderDirection -> Float -> List GameEntity
+straight : BeltRenderDirection -> Int -> List GameEntity
 straight dir y =
     [ { x = 0, y = y, direction = dir }
     , { x = 1, y = y, direction = dir }
@@ -274,7 +274,7 @@ straight dir y =
     ]
 
 
-straightVertical : BeltRenderDirection -> Float -> List GameEntity
+straightVertical : BeltRenderDirection -> Int -> List GameEntity
 straightVertical dir x =
     [ { x = x, y = 0, direction = dir }
     , { x = x, y = 1, direction = dir }
@@ -313,7 +313,7 @@ view model =
 
 
 grid =
-    shapes [] [ rect ( offsets.width - 0.5, -0.5 ) 1 (offsets.height * 20 + 0.5) ]
+    shapes [] [ rect ( toFloat offsets.width - 0.5, -0.5 ) 1 (toFloat (offsets.height * 20) + 0.5) ]
 
 
 renderSquare =
@@ -322,15 +322,15 @@ renderSquare =
 
 
 type alias Pos =
-    { x : Float
-    , y : Float
+    { x : Int
+    , y : Int
     }
 
 
 renderBelt : Pos -> Texture -> List Renderable
 renderBelt location tex =
     [ --shapes [ fill Color.lightGreen ] [ rect ( location.x, location.y ) w h ]
-      texture [] ( location.x, location.y ) tex
+      texture [] ( toFloat location.x, toFloat location.y ) tex
     ]
 
 
