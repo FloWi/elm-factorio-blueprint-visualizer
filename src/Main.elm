@@ -6,6 +6,7 @@ import Browser
 import Browser.Events exposing (onAnimationFrameDelta)
 import Canvas exposing (..)
 import Canvas.Settings exposing (..)
+import Canvas.Settings.Line exposing (lineWidth)
 import Canvas.Texture exposing (..)
 import Color
 import Css exposing (local)
@@ -20,6 +21,8 @@ import Svg.Styled.Attributes exposing (direction)
 type alias Model =
     { frame : Int
     , sprites : Load Sprites
+    , canvasWidth : Int
+    , canvasHeight : Int
     }
 
 
@@ -31,6 +34,7 @@ type Load a
 
 type alias Sprites =
     { animationFrames : Dict String (List Texture)
+    , original : Texture
     }
 
 
@@ -41,7 +45,11 @@ type Msg
 
 init : ( Model, Cmd Msg )
 init =
-    ( { frame = 0, sprites = Loading }
+    ( { frame = 0
+      , sprites = Loading
+      , canvasWidth = 2048
+      , canvasHeight = 2560
+      }
     , Cmd.none
     )
 
@@ -284,36 +292,111 @@ straightVertical dir x =
     ]
 
 
+
+-- view : Model -> Html Msg
+-- view model =
+--     let
+--         width =
+--             1024
+--         height =
+--             768
+--     in
+--     Canvas.toHtmlWith
+--         { width = width
+--         , height = height
+--         , textures = [ loadFromImageUrl "/hr-transport-belt.png" TextureLoaded ]
+--         }
+--         [ style "border" "1px solid black" ]
+--         ([ shapes [ fill Color.white ] [ rect ( 0, 0 ) width height ]
+--          , renderSquare
+--          ]
+--             ++ (circle { x = 0, y = 0 } Clockwise |> List.concatMap (renderBeltAnimation model))
+--             ++ (circle { x = 2, y = 0 } CounterClockwise |> List.concatMap (renderBeltAnimation model))
+--             ++ (straight WestEast 3 |> List.concatMap (renderBeltAnimation model))
+--             ++ (straight EastWest 4 |> List.concatMap (renderBeltAnimation model))
+--             ++ (straightVertical NorthSouth 4 |> List.concatMap (renderBeltAnimation model))
+--             ++ (straightVertical SouthNorth 5 |> List.concatMap (renderBeltAnimation model))
+--          -- ++ [ grid ]
+--         )
+
+
+renderSpriteGraphicWithGrid : Model -> List Renderable
+renderSpriteGraphicWithGrid model =
+    case model.sprites of
+        Success sprites ->
+            [ texture [] ( 0, 0 ) sprites.original, grid model ]
+
+        _ ->
+            []
+
+
 view : Model -> Html Msg
 view model =
-    let
-        width =
-            1024
-
-        height =
-            768
-    in
     Canvas.toHtmlWith
-        { width = width
-        , height = height
+        { width = model.canvasWidth
+        , height = model.canvasHeight
         , textures = [ loadFromImageUrl "/hr-transport-belt.png" TextureLoaded ]
         }
         [ style "border" "1px solid black" ]
-        ([ shapes [ fill Color.white ] [ rect ( 0, 0 ) width height ]
-         , renderSquare
+        ([ shapes [ fill Color.gray ] [ rect ( 0, 0 ) (toFloat model.canvasWidth) (toFloat model.canvasHeight) ]
          ]
-            ++ (circle { x = 0, y = 0 } Clockwise |> List.concatMap (renderBeltAnimation model))
-            ++ (circle { x = 2, y = 0 } CounterClockwise |> List.concatMap (renderBeltAnimation model))
-            ++ (straight WestEast 3 |> List.concatMap (renderBeltAnimation model))
-            ++ (straight EastWest 4 |> List.concatMap (renderBeltAnimation model))
-            ++ (straightVertical NorthSouth 4 |> List.concatMap (renderBeltAnimation model))
-            ++ (straightVertical SouthNorth 5 |> List.concatMap (renderBeltAnimation model))
+            ++ renderSpriteGraphicWithGrid model
          -- ++ [ grid ]
         )
 
 
-grid =
-    shapes [] [ rect ( toFloat offsets.width - 0.5, -0.5 ) 1 (toFloat (offsets.height * 20) + 0.5) ]
+grid : Model -> Renderable
+grid model =
+    let
+        verticals =
+            List.range 0 numAnimationFrames
+                |> List.concatMap
+                    (\i ->
+                        let
+                            xLeftEdge =
+                                toFloat (offsets.initialOffset.x + i * (offsets.width + offsets.offset.x))
+
+                            xLeftOverlapEdge =
+                                xLeftEdge - toFloat offsets.overlap
+
+                            xRightEdge =
+                                xLeftEdge + toFloat offsets.width
+
+                            xRightOverlapEdge =
+                                xRightEdge + toFloat offsets.overlap
+                        in
+                        [ path ( xLeftEdge, 0 ) [ lineTo ( xLeftEdge, toFloat model.canvasHeight ) ]
+                        , path ( xRightEdge, 0 ) [ lineTo ( xRightEdge, toFloat model.canvasHeight ) ]
+                        , path ( xLeftOverlapEdge, 0 ) [ lineTo ( xLeftOverlapEdge, toFloat model.canvasHeight ) ]
+                        , path ( xRightOverlapEdge, 0 ) [ lineTo ( xRightOverlapEdge, toFloat model.canvasHeight ) ]
+                        ]
+                    )
+
+        horizontals =
+            List.range 0 20
+                |> List.concatMap
+                    (\i ->
+                        let
+                            yTopEdge =
+                                toFloat (offsets.initialOffset.y + i * (offsets.height + offsets.offset.y))
+
+                            yTopOverlapEdge =
+                                yTopEdge - toFloat offsets.overlap
+
+                            yBottomEdge =
+                                yTopEdge + toFloat offsets.width
+
+                            yBottomOverlapEdge =
+                                yBottomEdge + toFloat offsets.overlap
+                        in
+                        [ path ( 0, yTopEdge ) [ lineTo ( toFloat model.canvasWidth, yTopEdge ) ]
+                        , path ( 0, yTopOverlapEdge ) [ lineTo ( toFloat model.canvasWidth, yTopOverlapEdge ) ]
+                        , path ( 0, yBottomEdge ) [ lineTo ( toFloat model.canvasWidth, yBottomEdge ) ]
+                        , path ( 0, yBottomOverlapEdge ) [ lineTo ( toFloat model.canvasWidth, yBottomOverlapEdge ) ]
+                        ]
+                    )
+    in
+    shapes [ stroke Color.lightRed, lineWidth 0.5 ] (verticals ++ horizontals)
 
 
 renderSquare =
@@ -343,7 +426,15 @@ update msg model =
             )
 
         TextureLoaded (Just texture) ->
-            ( { model | sprites = Success { animationFrames = createTextureDict texture } }, Cmd.none )
+            ( { model
+                | sprites =
+                    Success
+                        { animationFrames = createTextureDict texture
+                        , original = texture
+                        }
+              }
+            , Cmd.none
+            )
 
         TextureLoaded Nothing ->
             ( model, Cmd.none )
